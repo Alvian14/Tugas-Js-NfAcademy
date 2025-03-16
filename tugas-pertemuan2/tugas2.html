@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tugas pertemuan 2</title>
+    <style>
+        body{
+            color: rgb(0, 0, 0);
+        }
+        table {
+            width: 60%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            text-align: left;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+        th {
+            background-color: #4349e8;
+        }
+        tbody{
+            background-color: #7c7fe2;
+        }
+        tfoot {
+            font-weight: bold;
+            background-color: #cbcfe8;
+        }
+    </style>
+</head>
+<body>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Pegawai</th>
+                <th>Umur</th>
+                <th>Jabatan</th>
+                <th>Status</th>
+                <th>Gaji Pokok</th>
+                <th>Tunjangan Jabatan</th>
+                <th>BPJS</th>
+                <th>Tunjangan Keluarga</th>
+            </tr>
+        </thead>
+        <tbody id="pegawai"></tbody>
+        <tfoot id="gaji"></tfoot>
+    </table>
+
+    <script>
+
+        let pegawai = {
+            nama: "Dodi Prayodi",
+            umur: 25,
+            jabatan: "Manajer",
+            status: "Menikah"
+        };
+
+        let gajiPokok;
+        
+        if (pegawai.jabatan === "Manajer") {
+            gajiPokok = 15000000;
+        } else if (pegawai.jabatan === "Asisten Manajer") {
+            gajiPokok = 10000000;
+        } else if (pegawai.jabatan === "Staff") {
+            gajiPokok = 5000000;
+        } else {
+            gajiPokok = 0;
+        }
+
+        let tunjanganJabatan = 0.15 * gajiPokok;
+        let bpjs = 0.10 * gajiPokok;
+        let tunjanganKeluarga = (pegawai.status === "Menikah") ? 0.20 * gajiPokok : 0;
+        let totalGaji = gajiPokok + tunjanganJabatan + tunjanganKeluarga - bpjs;
+
+        let tbody = document.getElementById("pegawai");
+        tbody.innerHTML = `
+            <tr>
+                <td>${pegawai.nama}</td>
+                <td>${pegawai.umur} tahun</td>
+                <td>${pegawai.jabatan}</td>
+                <td>${pegawai.status}</td>
+                <td>Rp ${gajiPokok.toLocaleString()}</td>
+                <td>Rp ${tunjanganJabatan.toLocaleString()}</td>
+                <td>Rp ${bpjs.toLocaleString()}</td>
+                <td>Rp ${tunjanganKeluarga.toLocaleString()}</td>
+            </tr>
+        `;
+
+        let tfoot = document.getElementById("gaji");
+        tfoot.innerHTML = `
+            <tr>
+                <td colspan="7" style="border-right: none;"><b>Total Gaji Keseluruhan</b></td>
+                <td style="border-left: none;"><b>Rp ${totalGaji.toLocaleString()}</b></td>
+            </tr>
+        `;
+    </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tugas3-js</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .card {
+            border-radius: 10px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h2>Daftar Produk Toko</h2>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahProduk">Tambah Produk</button>
+                <div class="table-responsive">
+                    <table id="produkTable" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Harga</th>
+                                <th>Stok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="produk-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Produk -->
+    <div class="modal fade" id="modalTambahProduk" tabindex="-1" aria-labelledby="modalTambahProdukLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalTambahProdukLabel">Tambah Produk</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formTambahProduk">
+                        <div class="mb-3">
+                            <label for="namaProduk" class="form-label">Nama Produk</label>
+                            <input type="text" class="form-control" id="namaProduk" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hargaProduk" class="form-label">Harga</label>
+                            <input type="number" class="form-control" id="hargaProduk" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="stokProduk" class="form-label">Stok</label>
+                            <input type="number" class="form-control" id="stokProduk" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Tambah</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Notifikasi -->
+    <div class="modal fade" id="modalNotifikasi" tabindex="-1" aria-labelledby="modalNotifikasiLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalNotifikasiLabel">Sukses</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Produk berhasil ditambahkan!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalNotifikasiHapus" tabindex="-1" aria-labelledby="modalNotifikasiLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalNotifikasiLabel">Sukses</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Produk berhasil dihapus!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal hapus -->
+    <div class="modal fade" id="modalKonfirmasiHapus" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Apakah Anda yakin ingin menghapus produk ini?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+                    <button type="button" class="btn btn-danger" id="btnHapusProduk">Iya</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let produkToko = [
+            { id: 1, nama: "Laptop", harga: 7000000, stok: 5 },
+            { id: 2, nama: "Mouse", harga: 200000, stok: 10 },
+            { id: 3, nama: "Keyboard", harga: 350000, stok: 7 }
+        ];
+
+        function tampilkanProduk() {
+            let tbody = document.getElementById("produk-list");
+            tbody.innerHTML = "";
+            produkToko.forEach(produk => {
+                let row = `<tr>
+                    <td>${produk.id}</td>
+                    <td>${produk.nama}</td>
+                    <td>Rp ${produk.harga.toLocaleString()}</td>
+                    <td>${produk.stok}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="konfirmasiHapus(${produk.id})">Hapus</button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+            $('#produkTable').DataTable();
+        }
+
+        function tambahProduk(nama, harga, stok) {
+            let idBaru = produkToko.length > 0 ? produkToko[produkToko.length - 1].id + 1 : 1;
+            produkToko.push({ id: idBaru, nama, harga, stok });
+            $('#produkTable').DataTable().destroy();
+            tampilkanProduk();
+            $('#modalNotifikasi').modal('show');
+        }
+
+        document.getElementById("formTambahProduk").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let nama = document.getElementById("namaProduk").value;
+            let harga = parseInt(document.getElementById("hargaProduk").value);
+            let stok = parseInt(document.getElementById("stokProduk").value);
+            
+            if (!nama || isNaN(harga) || isNaN(stok) || harga <= 0 || stok <= 0) {
+                alert("Input tidak valid. Pastikan semua data diisi dengan benar.");
+                return;
+            }
+            
+            tambahProduk(nama, harga, stok);
+            document.getElementById("formTambahProduk").reset();
+            $('#modalTambahProduk').modal('hide');
+        });
+
+        function konfirmasiHapus(id) {
+            produkIdHapus = id;
+            $('#modalKonfirmasiHapus').modal('show');
+        }
+
+        document.getElementById("btnHapusProduk").addEventListener("click", function() {
+            hapusProduk(produkIdHapus);
+            $('#modalKonfirmasiHapus').modal('hide');
+        });
+
+        function hapusProduk(id) {
+            produkToko = produkToko.filter(produk => produk.id !== id);
+            $('#produkTable').DataTable().destroy();
+            tampilkanProduk();
+            $('#modalNotifikasiHapus').modal('show');
+        }
+
+        $(document).ready(function() {
+            tampilkanProduk();
+        });
+    </script>
+</body>
+</html>
